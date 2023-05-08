@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta property="og:title" content="My Personal Word List" />
+  <meta property="og:title" content="My Personal Word List by Ronanda Saputra" />
   <meta property="og:description" content="A collection of my words" />
   <meta property="og:image" content="{{url_for('static', filename='logo_red.png')}}" />
   <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}" type="image/x-icon" />
@@ -54,28 +54,29 @@
       <input id="input-word" class="form-control" style="margin-right: 0.5rem">
       <button class="btn btn-light text-uppercase" onclick="find_word()">Search</button>
     </div>
-
-    <table class="table">
-      <thead class="thead-light">
-        <tr>
-          <th scope="col" style="width:30%">WORD</th>
-          <th scope="col">MEANING</th>
-
-        </tr>
-      </thead>
-      <tbody id="tbody-box">
-        {% for word in words %}
-        <tr id="word-{{word.word}}">
-          <td>
-            <a href="/detail/{{word.word}}?status_give=old">
-              {{word.word}}
-            </a>
-          </td>
-          <td>{{word.definition}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="container">
+      <table class="table">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col" style="width:30%">WORD</th>
+            <th scope="col">MEANING</th>
+  
+          </tr>
+        </thead>
+        <tbody id="tbody-box">
+          {% for word in words %}
+          <tr id="word-{{word.word}}">
+            <td>
+              <a href="/detail/{{word.word}}?status_give=old">
+                {{word.word}}
+              </a>
+            </td>
+            <td>{{word.definition}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="container">

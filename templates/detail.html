@@ -5,7 +5,7 @@
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      <meta property="og:title" content="My Personal Word List" />
+      <meta property="og:title" content="My Personal Word List by Ronanda Saputra" />
       <meta property="og:description" content="A collection of my words" />
       <meta property="og:image" content="{{url_for('static', filename='logo_red.png')}}" />
       <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}" type="image/x-icon" />
@@ -21,6 +21,7 @@
             let word = '{{ word }}';
             $(document).ready(function () {
                   // get_definitions();
+                  get_examples();
             });
 
             function get_definitions() {
@@ -53,10 +54,8 @@
 
             function save_word() {
                   let defs = {{ definitions | tojson }};
-                  let dateA = Date(Date.now());
-                  let dateB = dateA.toString()
-                  
-                  for (let i=0; i < defs.length; i++){
+
+                  for (let i = 0; i < defs.length; i++) {
                         let def = defs[0];
                         let category = def.fl;
                         let shortdef = def.shortdef[0];
@@ -68,10 +67,9 @@
                         };
                   }
 
-                  let data =  {
+                  let data = {
                         word_give: word,
                         definitions_give: defs,
-                        date_give: dateB,
                   }
                   $.ajax({
                         type: 'POST',
@@ -80,12 +78,12 @@
                         headers: {
                               'Content-Type': 'application/json',
                         },
-                        success: function(response) {
+                        success: function (response) {
                               if (response.result === 'success') {
-                              alert(response.msg);
-                              window.location.href = `/detail/${word}?status_give=old`;
+                                    alert(response.msg);
+                                    window.location.href = `/detail/${word}?status_give=old`;
                               } else {
-                              alert('Something went wrong');
+                                    alert('Something went wrong');
                               }
                         }
                   });
@@ -98,13 +96,79 @@
                         data: {
                               word_give: word,
                         },
-                        success: function(response) {
+                        success: function (response) {
                               if (response.result === 'success') {
-                              alert(response.msg);
-                              window.location.href = `/detail/${word}?status_give=new`;
+                                    alert(response.msg);
+                                    window.location.href = `/detail/${word}?status_give=new`;
                               } else {
-                              alert('Something went wrong...');
+                                    alert('Something went wrong...');
                               }
+                        }
+                  });
+            }
+            
+            function get_examples() {
+                  let container = $("#example-list");
+                  container.empty();
+                  $.ajax({
+                      type: "GET",
+                      url: `/api/get_exs?word=${word}`,
+                      data: {},
+                      success: function (response) {
+                        let examples = response.examples;
+                        let temp_html = '';
+                        for (let i = 0; i < examples.length; i++) {
+                          let example = examples[i];
+                          let id = example.id;
+                          let sentence = example.example;
+                          temp_html += `
+                                          <li>
+                                          ${sentence}
+                                          <button class="btn btn-danger" onclick="delete_ex('${id}')">
+                                                DELETE
+                                          </button>
+                                          </li>
+                                          <br>
+                          `;
+                        }
+                        container.append(temp_html);
+                      }
+                  });
+              }
+
+            function add_ex() {
+                  let new_ex = $('#new-example').val();
+                  $.ajax({
+                        type: "POST",
+                        url: '/api/save_ex',
+                        data: {
+                              example: new_ex,
+                              word: word,
+                        },
+                        success: function (response) {
+                              console.log(response)
+                              if (response.result === 'success'){
+                                    alert(response.msg);
+                                    get_examples();
+                              };
+                        }
+                  });
+
+
+            }
+
+            function delete_ex(id) {
+                  console.log("deleting", id)
+                  $.ajax({
+                        type: "POST",
+                        url: '/api/delete_ex',
+                        data: {
+                              word: word,
+                              id: id
+                        },
+                        success: function (response) {
+                              alert(response.msg);
+                              get_examples();
                         }
                   });
             }
@@ -146,6 +210,17 @@
                   <button onclick="delete_word()" id="btn-delete" class="btn btn-sparta btn-lg">
                         DELETE
                   </button>
+
+                  <div id="examples" class="container">
+                        <h3 style="text-align: center;margin-bottom:1rem">Write your own sentences!</h3>
+                        <ul id="example-list">
+                        </ul>
+                        <div class="d-flex justify-content-between" style="margin-left:20px;">
+                              <input id="new-example" class="form-control form-control-sm" style="margin-right: 0.5rem">
+                              <button class="btn btn-outline-secondary btn-sm" onclick="add_ex()">add</button>
+                        </div>
+                  </div>
+
                   {% endif %}
             </div>
       </div>
